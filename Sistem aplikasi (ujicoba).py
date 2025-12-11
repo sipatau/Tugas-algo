@@ -30,9 +30,9 @@ def get_secret(key: str, default: Optional[str] = None) -> Optional[str]:
 
 st.set_page_config(layout="wide")
 
-ADMIN_PASSWORD = get_secret("ADMIN_PASSWORD", "admin123")
-USER_PASSWORD = get_secret("USER_PASSWORD", "user123")
-DATA_FILENAME = get_secret("DATA_FILENAME", "mahasiswa_data.json")
+ADMIN_PASSWORD = get_secret("ADMIN_PASSWORD")
+USER_PASSWORD = get_secret("USER_PASSWORD")
+DATA_FILENAME = get_secret("DATA_FILENAME")
 
 # Kredensial Admin yang tersimpan
 EMAIL_PENGIRIM = get_secret("EMAIL_PENGIRIM")
@@ -480,7 +480,7 @@ if st.session_state['role'] == "guest":
 else:
     with st.sidebar:
         # Pengecekan: Pastikan gambar logo Unpam sudah Anda letakkan secara lokal
-        st.image("https://www.unpam.ac.id/wp-content/uploads/2021/08/logo-unpam-new-2021-300x95.png")
+        st.image("https://1.bp.blogspot.com/-vVS34SwFWFI/WjCSXpKb0BI/AAAAAAAAF6Y/HjlGqQNtBq0HPFQUFzd2CE0DD6a0i30xwCLcBGAs/s1600/Unpam.png")
         st.markdown("### 👤 Informasi Pengguna")
         st.markdown(f"**Role Aktif:** {st.session_state['role'].upper()}")
         st.markdown(f"**Nama User:** {st.session_state.get('login_user', 'N/A')}")
@@ -514,3 +514,4 @@ else:
         stat_email_page()
     else:
         st.session_state['role'] = "guest"
+
