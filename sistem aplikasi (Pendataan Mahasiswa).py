@@ -448,7 +448,7 @@ if st.session_state['role'] == "guest":
     login_page()
 else:
     with st.sidebar:
-        st.image("https://www.unpam.ac.id/wp-content/uploads/2021/08/logo-unpam-new-2021-300x95.png")
+        st.image("https://www.bing.com/th/id/OIP.NRQxqAviwTtWhhNuNtHF6wHaHa?w=227&h=211&c=8&rs=1&qlt=90&o=6&cb=ucfimg1&dpr=1.5&pid=3.1&rm=2&ucfimg=1")
         st.markdown("### 👤 Informasi Pengguna")
         st.markdown(f"**Role Aktif:** {st.session_state['role'].upper()}")
         st.markdown(f"**Nama User:** {st.session_state.get('login_user', 'N/A')}")
@@ -481,3 +481,4 @@ else:
     else:
         st.session_state['role'] = "guest"
   
+
