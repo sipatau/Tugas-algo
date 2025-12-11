@@ -1,15 +1,3 @@
-# REFRACTORED: Aplikasi Pendataan Mahasiswa (Secure + .env + fpdf)
-# File: pendataan_mahasiswa_refactor.py
-# -----------------------------------------------------------------------------
-# Catatan:
-# - File ini adalah versi refactor dari "sistem aplikasi (Pendataan Mahasiswa).py".
-# - Semua credential sensitif dipindahkan ke environment (.env) atau Streamlit Secrets.
-# - Fungsi PDF dibuat menggunakan `fpdf` (lebih ringan & lebih kompatibel di hosting).
-# - Ditambahkan implementasi edit/hapus pada MahasiswaDataManager.
-# - Untuk development, file `.env` dapat digunakan. Untuk hosting (Streamlit Cloud),
-#   gunakan `st.secrets`.
-# -----------------------------------------------------------------------------
-
 import os
 import re
 import json
@@ -27,26 +15,19 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 
-# -----------------------------------------------------------------------------
-# LOAD ENV
-# -----------------------------------------------------------------------------
-# Load .env for local development. On Streamlit Cloud, prefer st.secrets.
 load_dotenv()
 
 def get_secret(key: str, default: Optional[str] = None) -> Optional[str]:
     """Ambil secret dari st.secrets (hosting) atau dari environment variable."""
-    # Prioritas: st.secrets -> os.environ
+
     try:
         if hasattr(st, 'secrets') and key in st.secrets:
             return st.secrets[key]
     except Exception:
-        # saat import sebelum Streamlit context, ignore
+
         pass
     return os.getenv(key, default)
 
-# -----------------------------------------------------------------------------
-# CONFIG
-# -----------------------------------------------------------------------------
 st.set_page_config(layout="wide")
 
 ADMIN_PASSWORD = get_secret("ADMIN_PASSWORD", "admin123")
@@ -63,23 +44,17 @@ USERS = {
 
 HEADERS = ["Nama", "NIM", "Jurusan", "Hobi", "Cita-cita", "Tanggal Dibuat"]
 
-# Session state init
+
 if 'role' not in st.session_state:
     st.session_state['role'] = "guest"
 if 'page' not in st.session_state:
     st.session_state['page'] = "Dashboard"
 
-# -----------------------------------------------------------------------------
-# EXCEPTIONS
-# -----------------------------------------------------------------------------
 class MahasiswaException(Exception): pass
 class ValidationException(MahasiswaException): pass
 class FileOperationException(MahasiswaException): pass
 class DataNotFoundException(MahasiswaException): pass
 
-# -----------------------------------------------------------------------------
-# VALIDATOR
-# -----------------------------------------------------------------------------
 class Validator:
     NAMA_PATTERN = r'^[A-Za-z\s]{3,50}$'
     NIM_PATTERN = r'^\d{12}$'
@@ -108,9 +83,6 @@ class Validator:
             return False, "\n".join(errors)
         return True, ""
 
-# -----------------------------------------------------------------------------
-# MAHASISWA
-# -----------------------------------------------------------------------------
 class Mahasiswa:
     def __init__(self, nama: str, nim: str, jurusan: str, hobi: str, cita_cita: str, created_at: Optional[str] = None):
         self._nama = (nama or "").strip()
@@ -147,9 +119,6 @@ class Mahasiswa:
     def from_dict(data: dict) -> 'Mahasiswa':
         return Mahasiswa(data.get('nama',''), data.get('nim',''), data.get('jurusan',''), data.get('hobi',''), data.get('cita_cita',''), data.get('created_at'))
 
-# -----------------------------------------------------------------------------
-# DATA MANAGER
-# -----------------------------------------------------------------------------
 class MahasiswaDataManager:
     def __init__(self, filename: str = DATA_FILENAME):
         self._filename = filename
@@ -204,10 +173,10 @@ class MahasiswaDataManager:
         is_valid, err = Validator.validate_all(nama, nim_baru, jurusan, hobi, cita)
         if not is_valid:
             raise ValidationException(err)
-        # Pastikan NIM baru tidak bentrok (kecuali sama dengan yang lama)
+  
         if nim_baru != nim_lama and self.cari_by_nim(nim_baru):
             raise ValidationException("NIM baru sudah terpakai oleh mahasiswa lain")
-        # Update fields
+  
         target._nama = nama.strip()
         target._nim = nim_baru.strip()
         target._jurusan = jurusan.strip()
@@ -228,16 +197,13 @@ class MahasiswaDataManager:
         self.save_to_file()
         return round((time.time() - start) * 1000, 2)
 
-# global manager
+
 data_manager = MahasiswaDataManager()
 
 def data_to_df(mahasiswas: List[Mahasiswa]) -> pd.DataFrame:
     data = [[m.nama, m.nim, m.jurusan, m.hobi, m.cita_cita, m.tanggal] for m in mahasiswas]
     return pd.DataFrame(data, columns=HEADERS)
 
-# -----------------------------------------------------------------------------
-# PDF GENERATOR using FPDF
-# -----------------------------------------------------------------------------
 class SimplePDF(FPDF):
     def header(self):
         self.set_font('Arial', 'B', 12)
@@ -249,7 +215,7 @@ def _create_pdf_bytes(df: pd.DataFrame) -> BytesIO:
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.set_font('Arial', size=10)
 
-    # headers
+
     col_names = ['Nama', 'NIM', 'Jurusan', 'Hobi', 'Cita-cita', 'Dibuat']
     widths = [40, 30, 35, 30, 35, 30]
     for i, h in enumerate(col_names):
@@ -270,9 +236,6 @@ def _create_pdf_bytes(df: pd.DataFrame) -> BytesIO:
     buf.seek(0)
     return buf
 
-# -----------------------------------------------------------------------------
-# EMAIL SENDING (reads credentials from env/st.secrets)
-# -----------------------------------------------------------------------------
 
 def gr_kirim_email_attachment(email_tujuan: str, role: str, format_file: str) -> str:
     if role != "admin":
@@ -323,7 +286,7 @@ def gr_kirim_email_attachment(email_tujuan: str, role: str, format_file: str) ->
             part.add_header('Content-Disposition', f'attachment; filename="{filename}.pdf"')
             msg.attach(part)
 
-        # Send
+  
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         server.login(EMAIL_PENGIRIM, EMAIL_APP_PASSWORD)
@@ -332,10 +295,6 @@ def gr_kirim_email_attachment(email_tujuan: str, role: str, format_file: str) ->
         return f"✅ Data ({format_file}) berhasil dikirim ke {email_tujuan}."
     except Exception as e:
         return f"❌ Gagal mengirim email: {e}"
-
-# -----------------------------------------------------------------------------
-# STREAMLIT PAGES (kehilangan detail UI tetap dipertahankan)
-# -----------------------------------------------------------------------------
 
 def login_page():
     st.title("🔐 Login Portal Mahasiswa")
@@ -351,7 +310,6 @@ def login_page():
             if username in USERS and USERS[username]["password"] == password:
                 st.session_state['role'] = USERS[username]["role"]
                 st.session_state['page'] = "Dashboard"
-                st.experimental_rerun()
             else:
                 st.error("Username atau password salah. Coba admin/admin123 atau user/user123")
     with col2:
@@ -486,9 +444,6 @@ def stat_email_page():
                 else:
                     st.error("Masukkan email tujuan.")
 
-# -----------------------------------------------------------------------------
-# MAIN
-# -----------------------------------------------------------------------------
 if st.session_state['role'] == "guest":
     login_page()
 else:
@@ -514,7 +469,7 @@ else:
         if st.session_state['page'] == "Logout":
             st.session_state['role'] = "guest"
             st.session_state['page'] = "Dashboard"
-            st.experimental_rerun()
+            
     if st.session_state['page'] == "Dashboard":
         dashboard_page()
     elif st.session_state['page'] == "CRUD":
@@ -525,28 +480,4 @@ else:
         stat_email_page()
     else:
         st.session_state['role'] = "guest"
-        st.experimental_rerun()
-
-# -----------------------------------------------------------------------------
-# END
-# -----------------------------------------------------------------------------
-
-# -----------------------------------------------------------------------------
-# .env.example (copy -> .env locally, DO NOT commit .env)
-# -----------------------------------------------------------------------------
-# ADMIN_PASSWORD=admin123
-# USER_PASSWORD=user123
-# DATA_FILENAME=mahasiswa_data.json
-# EMAIL_PENGIRIM=youremail@gmail.com
-# EMAIL_APP_PASSWORD=your_app_password_here
-
-# -----------------------------------------------------------------------------
-# .gitignore (Tambahkan baris ini di repo Anda)
-# -----------------------------------------------------------------------------
-# .env
-# __pycache__/
-# *.pyc
-# *.pyo
-# .DS_Store
-# mahasiswa_data.json
-# -----------------------------------------------------------------------------
+  
