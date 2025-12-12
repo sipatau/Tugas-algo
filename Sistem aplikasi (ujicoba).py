@@ -301,25 +301,136 @@ def gr_kirim_email_attachment(email_tujuan: str, role: str, format_file: str, se
         return f"❌ Gagal mengirim email: {e}"
 
 def login_page():
-    st.title("🔐 Login Portal Mahasiswa")
-    st.markdown("---")
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        st.header("Masuk")
-        username = st.text_input("Username", key="login_user")
-        password = st.text_input("Password", type="password", key="login_pass")
-        if st.button("Login"):
-            username = (username or "").strip()
-            password = (password or "").strip()
-            if username in USERS and USERS[username]["password"] == password:
-                st.session_state['role'] = USERS[username]["role"]
-                st.session_state['page'] = "Dashboard"
-            else:
-                st.error("Username atau password salah. Coba admin/admin123 atau user/user123")
-    with col2:
-        st.info(f"**Role Aktif: {st.session_state['role'].upper()}**\n\nAkses Admin diperlukan untuk fitur CRUD, Sort, dan Email.")
+    # --- PATH LOKAL ---
+    BG_IMAGE_URL = "https://sl.bing.net/f2IjDCLY1Yq"  
+    LOGO_SASMITAJAYA_URL = "https://sl.bing.net/jDJdk79DGTs" 
+    LOGO_CIRCULAR_URL = "https://sl.bing.net/kg96rV0TT2a" 
+    # ------------------
 
+    # ... Sisa kode
+    st.markdown(
+        f"""
+        <style>
+        /* 1. BACKGROUND IMAGE */
+        /* Mengaplikasikan gambar pada container utama aplikasi Streamlit */
+        [data-testid="stAppViewContainer"] {{
+            background-image: url({BG_IMAGE_URL});
+            background-size: cover; /* Menutupi seluruh area */
+            background-attachment: fixed; /* Gambar tetap saat scroll */
+            background-position: center;
+        }}
+        /* Menghilangkan background sidebar bawaan agar background utama terlihat */
+        [data-testid="stSidebar"] {{
+            background-color: transparent; 
+        }}
+        
+        /* 2. LOGIN CONTAINER STYLING */
+        .login-container {{
+            padding: 30px 40px;
+            border-radius: 15px; /* Corner agak membulat */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            background-color: #ffffff;
+            margin-top: 50px; 
+        }}
+        
+        /* 3. INPUT STYLING */
+        /* Memastikan label input terlihat tebal */
+        .stTextInput label, .stTextInput > div > div > label {{
+            font-weight: bold;
+            color: #333333; 
+        }}
 
+        /* 4. BUTTON STYLING */
+        /* Warna Biru Terang sesuai gambar: #2E90FF */
+        .stButton>button {{
+            width: 100%;
+            background-color: #2E90FF; 
+            color: white;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            margin-top: 15px; /* Jarak dari input */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }}
+        .stButton>button:hover {{
+            background-color: #1A73E8; 
+        }}
+
+        /* 5. HEADER LAYOUT (Untuk Logo dan Teks LOGIN) */
+        .header-login {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }}
+        .header-login img {{
+            height: 40px; /* Ukuran logo */
+            width: auto;
+        }}
+        .header-login h1 {{
+            font-size: 28px;
+            font-weight: bold;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+        }}
+        
+        /* Mengatur link Lupa Password */
+        .reset-link {{
+            color: #2E90FF !important;
+            text-decoration: none;
+            font-weight: 500;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # 2. Layout Tengah (Memastikan kotak login di tengah)
+    col_center = st.columns([1, 0.4, 1])[1]
+
+    with col_center:
+        with st.container():
+            st.markdown('<div class="login-container">', unsafe_allow_html=True)
+            
+            # --- HEADER DENGAN LOGO ---
+            st.markdown(
+                f"""
+                <div class="header-login">
+                    <img src="{LOGO_SASMITAJAYA_URL}" alt="Sasmitajaya Logo">
+                    <h1>LOGIN</h1>
+                    <img src="{LOGO_CIRCULAR_URL}" alt="Circular Logo">
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+            
+            # 3. Form Input
+            with st.form("form_login_unpam"):
+                # Input disesuaikan dengan teks di gambar (ada asterisk)
+                username = st.text_input("Username *", key="login_user", help="Gunakan admin atau user")
+                password = st.text_input("Password *", type="password", key="login_pass", help="Gunakan admin123 atau user123")
+                
+                # Tombol LOGIN
+                if st.form_submit_button("LOGIN"):
+                    username = (username or "").strip()
+                    password = (password or "").strip()
+                    if username in USERS and USERS[username]["password"] == password:
+                        st.session_state['role'] = USERS[username]["role"]
+                        st.session_state['page'] = "Dashboard"
+                    else:
+                        st.error("Username atau password salah. Coba admin/admin123 atau user/user123")
+
+            # 4. Link Lupa Password (TIDAK ADA Cloudflare dan SSO sesuai permintaan)
+            st.markdown("<p style='text-align:center; margin-top: 20px;'>", unsafe_allow_html=True)
+            st.markdown('[<span class="reset-link">Lupa Password?</span>](https://my.unpam.ac.id/reset-password)', unsafe_allow_html=True)
+            st.markdown("</p>", unsafe_allow_html=True)
+            
+            st.markdown('</div>', unsafe_allow_html=True) 
+            
+    # Tampilkan Role Aktif di bawah (menggunakan teks putih agar terlihat di background biru)
+    st.markdown(f"<div style='text-align:center; margin-top: 20px; color: white;'>**Role Aktif: {st.session_state['role'].upper()}**</div>", unsafe_allow_html=True)
 def dashboard_page():
     st.header(f"👋 Selamat Datang, {st.session_state['role'].title()}!")
     st.markdown("## 📚 Data Mahasiswa")
@@ -480,7 +591,7 @@ if st.session_state['role'] == "guest":
 else:
     with st.sidebar:
         # Pengecekan: Pastikan gambar logo Unpam sudah Anda letakkan secara lokal
-        st.image("https://1.bp.blogspot.com/-vVS34SwFWFI/WjCSXpKb0BI/AAAAAAAAF6Y/HjlGqQNtBq0HPFQUFzd2CE0DD6a0i30xwCLcBGAs/s1600/Unpam.png")
+        st.image("https://www.unpam.ac.id/wp-content/uploads/2021/08/logo-unpam-new-2021-300x95.png")
         st.markdown("### 👤 Informasi Pengguna")
         st.markdown(f"**Role Aktif:** {st.session_state['role'].upper()}")
         st.markdown(f"**Nama User:** {st.session_state.get('login_user', 'N/A')}")
@@ -514,4 +625,3 @@ else:
         stat_email_page()
     else:
         st.session_state['role'] = "guest"
-
