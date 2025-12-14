@@ -50,6 +50,46 @@ if 'role' not in st.session_state:
 if 'page' not in st.session_state:
     st.session_state['page'] = "Dashboard"
 
+def apply_transparent_background(bg_image_url: str = None):
+    bg_css = ""
+
+    if bg_image_url:
+        bg_css = f"""
+        .stApp {{
+            background-image: url("{bg_image_url}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }}
+        """
+
+    st.markdown(
+        f"""
+        <style>
+        {bg_css}
+
+        /* Konten utama (KANAN) dibuat transparan */
+        section[data-testid="stMain"] {{
+            background-color: transparent;
+        }}
+
+        /* Container dalam main (aman & ringan) */
+        div[data-testid="stVerticalBlock"] {{
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 1rem;
+            border-radius: 10px;
+        }}
+
+        /* Sidebar BIARKAN DEFAULT (TIDAK DISENTUH) */
+        /* Tidak ada CSS untuk stSidebar */
+
+        /* Text default (tidak dipaksa putih) */
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
 class MahasiswaException(Exception): pass
 class ValidationException(MahasiswaException): pass
 class FileOperationException(MahasiswaException): pass
@@ -160,10 +200,32 @@ class MahasiswaDataManager:
         self._mahasiswa_list.append(mahasiswa)
         self.save_to_file()
 
+    # Ganti fungsi cari_by_nim yang lama dengan ini:
     def cari_by_nim(self, nim: str) -> Optional[Mahasiswa]:
-        for mhs in self._mahasiswa_list:
-            if mhs.nim == (nim or ""):
+        """
+        Mencari Mahasiswa berdasarkan NIM menggunakan Binary Search.
+        List diurutkan sementara sebelum pencarian.
+        """
+        if not Validator.validate_nim(nim):
+            return None
+
+        # Binary Search membutuhkan list yang terurut.
+        sorted_list = sorted(self._mahasiswa_list, key=lambda x: x.nim)
+        
+        low = 0
+        high = len(sorted_list) - 1
+
+        while low <= high:
+            mid = (low + high) // 2
+            mhs = sorted_list[mid]
+            
+            if mhs.nim == nim:
                 return mhs
+            elif mhs.nim < nim:
+                low = mid + 1
+            else:
+                high = mid - 1
+        
         return None
 
     def edit_mahasiswa(self, nim_lama: str, nama: str, nim_baru: str, jurusan: str, hobi: str, cita: str) -> None:
@@ -194,6 +256,107 @@ class MahasiswaDataManager:
     def merge_sort_by_jurusan(self) -> float:
         start = time.time()
         self._mahasiswa_list.sort(key=lambda x: x.jurusan.lower())
+        self.save_to_file()
+        return round((time.time() - start) * 1000, 2)
+    
+    # Tambahkan ini di dalam class MahasiswaDataManager:
+
+    def cari_by_nim_binary(self, nim: str) -> Optional[Mahasiswa]:
+        """
+        Mencari Mahasiswa berdasarkan NIM menggunakan Binary Search.
+        Membutuhkan list yang SANGAT terurut berdasarkan NIM.
+        """
+        if not Validator.validate_nim(nim):
+            return None
+
+        # Untuk memastikan Binary Search berjalan sempurna,
+        # kita harus mengurutkan data terlebih dahulu berdasarkan NIM.
+        # Catatan: NIM sudah unik, jadi urutan ini konsisten.
+        sorted_list = sorted(self._mahasiswa_list, key=lambda x: x.nim)
+        
+        low = 0
+        high = len(sorted_list) - 1
+
+        while low <= high:
+            mid = (low + high) // 2
+            mhs = sorted_list[mid]
+            
+            if mhs.nim == nim:
+                return mhs
+            elif mhs.nim < nim:
+                low = mid + 1
+            else:
+                high = mid - 1
+        
+        return None
+        
+    def cari_by_nama_linear(self, query: str) -> List[Mahasiswa]:
+        """
+        Mencari Mahasiswa berdasarkan nama menggunakan Linear Search.
+        """
+        if not query:
+            return []
+        query = query.strip().lower()
+        
+        hasil = []
+        for mhs in self._mahasiswa_list:
+            # Cari nama yang mengandung query
+            if query in mhs.nama.lower():
+                hasil.append(mhs)
+        return hasil
+
+    def cari_by_hobi_sequential(self, query: str) -> List[Mahasiswa]:
+        """
+        Mencari Mahasiswa berdasarkan hobi menggunakan Sequential Search.
+        (Secara fungsional sama dengan Linear Search, tapi diterapkan pada kolom Hobi).
+        """
+        if not query:
+            return []
+        query = query.strip().lower()
+        
+        hasil = []
+        for mhs in self._mahasiswa_list:
+            # Cari hobi yang mengandung query
+            if query in mhs.hobi.lower():
+                hasil.append(mhs)
+        return hasil
+    
+    # Tambahkan ini di dalam class MahasiswaDataManager:
+
+    def bubble_sort_by_nama(self) -> float:
+        """Mengurutkan data berdasarkan Nama menggunakan Bubble Sort."""
+        start = time.time()
+        n = len(self._mahasiswa_list)
+        
+        for i in range(n - 1):
+            swapped = False
+            for j in range(0, n - i - 1):
+                # Membandingkan dan menukar nama (case-insensitive)
+                if self._mahasiswa_list[j].nama.lower() > self._mahasiswa_list[j + 1].nama.lower():
+                    self._mahasiswa_list[j], self._mahasiswa_list[j + 1] = self._mahasiswa_list[j + 1], self._mahasiswa_list[j]
+                    swapped = True
+            if not swapped:
+                break
+                
+        self.save_to_file()
+        return round((time.time() - start) * 1000, 2)
+
+    def selection_sort_by_nim(self) -> float:
+        """Mengurutkan data berdasarkan NIM menggunakan Selection Sort."""
+        start = time.time()
+        n = len(self._mahasiswa_list)
+        
+        for i in range(n):
+            min_idx = i
+            # Mencari elemen terkecil di sisa list
+            for j in range(i + 1, n):
+                # Membandingkan NIM (string angka)
+                if self._mahasiswa_list[j].nim < self._mahasiswa_list[min_idx].nim:
+                    min_idx = j
+                    
+            # Menukar elemen terkecil yang ditemukan dengan elemen pada posisi i
+            self._mahasiswa_list[i], self._mahasiswa_list[min_idx] = self._mahasiswa_list[min_idx], self._mahasiswa_list[i]
+            
         self.save_to_file()
         return round((time.time() - start) * 1000, 2)
 
@@ -237,21 +400,21 @@ def _create_pdf_bytes(df: pd.DataFrame) -> BytesIO:
     return buf
 
 
-def gr_kirim_email_attachment(email_tujuan: str, role: str, format_file: str) -> str:
-    if role != "admin":
-        return "❌ Hanya ADMIN yang boleh mengirim email."
+def gr_kirim_email_attachment(email_tujuan: str, role: str, format_file: str, sender_email: str, sender_app_password: str) -> str:
+    
     if not email_tujuan or not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email_tujuan):
         return "❌ Format email tujuan tidak valid."
-    if not EMAIL_PENGIRIM or not EMAIL_APP_PASSWORD:
-        return "❌ EMAIL_PENGIRIM atau EMAIL_APP_PASSWORD belum dikonfigurasi (lihat .env / st.secrets)"
-
+    
+    if not sender_email or not sender_app_password:
+        return "❌ Email Pengirim atau App Password belum diisi."
+        
     df = data_to_df(data_manager.get_all_mahasiswa())
     if df.empty:
         return "ℹ Tidak ada data mahasiswa untuk dikirim."
 
     msg = MIMEMultipart('mixed')
     msg['Subject'] = f"Data Mahasiswa ({format_file}) - {datetime.now().strftime('%Y-%m-%d')}"
-    msg['From'] = EMAIL_PENGIRIM
+    msg['From'] = sender_email # Menggunakan email yang diinput/tersimpan
     msg['To'] = email_tujuan
 
     body = "Terlampir adalah data mahasiswa dalam format " + format_file + "."
@@ -289,14 +452,20 @@ def gr_kirim_email_attachment(email_tujuan: str, role: str, format_file: str) ->
   
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
-        server.login(EMAIL_PENGIRIM, EMAIL_APP_PASSWORD)
+        # Login menggunakan kredensial yang diinput/tersimpan
+        server.login(sender_email, sender_app_password)
         server.send_message(msg)
         server.quit()
-        return f"✅ Data ({format_file}) berhasil dikirim ke {email_tujuan}."
+        return f"✅ Data ({format_file}) berhasil dikirim dari {sender_email} ke {email_tujuan}."
     except Exception as e:
+        if "Authentication failed" in str(e):
+             return "❌ Gagal mengirim email: Autentikasi gagal. Pastikan App Password Anda benar dan email Anda mengizinkan akses aplikasi pihak ketiga."
         return f"❌ Gagal mengirim email: {e}"
 
 def login_page():
+    apply_transparent_background(
+        "https://s3.bukalapak.com/bukalapak-kontenz-production/content_attachments/89753/original/biaya_kuliah_unpam_2.jpg"
+    )
     st.title("🔐 Login Portal Mahasiswa")
     st.markdown("---")
     col1, col2 = st.columns([1, 2])
@@ -315,8 +484,10 @@ def login_page():
     with col2:
         st.info(f"**Role Aktif: {st.session_state['role'].upper()}**\n\nAkses Admin diperlukan untuk fitur CRUD, Sort, dan Email.")
 
-
 def dashboard_page():
+    apply_transparent_background(
+        "https://s3.bukalapak.com/bukalapak-kontenz-production/content_attachments/89753/original/biaya_kuliah_unpam_2.jpg"
+    )
     st.header(f"👋 Selamat Datang, {st.session_state['role'].title()}!")
     st.markdown("## 📚 Data Mahasiswa")
     col_filter, col_total = st.columns([3,1])
@@ -328,6 +499,9 @@ def dashboard_page():
 
 
 def crud_page():
+    apply_transparent_background(
+        "https://s3.bukalapak.com/bukalapak-kontenz-production/content_attachments/89753/original/biaya_kuliah_unpam_2.jpg"
+    )
     st.title("📥 Manajemen Data Mahasiswa (Admin)")
     if st.session_state['role'] != 'admin':
         st.error("Akses Ditolak. Halaman ini hanya untuk Admin.")
@@ -377,40 +551,90 @@ def crud_page():
 
 
 def search_sort_page():
+    apply_transparent_background(
+        "https://s3.bukalapak.com/bukalapak-kontenz-production/content_attachments/89753/original/biaya_kuliah_unpam_2.jpg"
+    )
     st.title("🔎 Pencarian & 📊 Pengurutan")
     col_search, col_sort = st.columns(2)
+    
+    # Inisialisasi hasil pencarian kosong
+    hasil_pencarian: List[Mahasiswa] = []
+    waktu_eksekusi = 0.0
+    
     with col_search:
         st.subheader("Pencarian Data")
         metode_cari = st.radio("Metode Pencarian", options=["Linear (Nama)", "Binary (NIM)", "Sequential (Hobi)"], horizontal=True)
         q_cari = st.text_input("Kata kunci / NIM")
         btn_cari = st.button("Cari Data")
-        if btn_cari:
-            if metode_cari == "Binary (NIM)" and Validator.validate_nim(q_cari):
-                hasil = data_manager.cari_by_nim(q_cari)
-                st.dataframe(data_to_df([hasil]) if hasil else pd.DataFrame(), use_container_width=True)
-                st.success(f"Ditemukan 1 data (Binary Search)." if hasil else "Tidak ditemukan.")
-            else:
-                st.warning("Fitur pencarian lengkap (Linear/Sequential) di-mock di Streamlit.")
+        
+        if btn_cari and q_cari:
+            start_time = time.time()
+            try:
+                if metode_cari == "Binary (NIM)":
+                    if not Validator.validate_nim(q_cari):
+                         st.error("❌ NIM harus tepat 12 digit angka untuk Binary Search.")
+                    else:
+                        hasil = data_manager.cari_by_nim_binary(q_cari)
+                        if hasil:
+                            hasil_pencarian = [hasil]
+                        waktu_eksekusi = (time.time() - start_time) * 1000
+                
+                elif metode_cari == "Linear (Nama)":
+                    hasil_pencarian = data_manager.cari_by_nama_linear(q_cari)
+                    waktu_eksekusi = (time.time() - start_time) * 1000
+                    
+                elif metode_cari == "Sequential (Hobi)":
+                    hasil_pencarian = data_manager.cari_by_hobi_sequential(q_cari)
+                    waktu_eksekusi = (time.time() - start_time) * 1000
+                
+                # Menampilkan status pencarian
+                if 'hasil_pencarian' in locals() and hasil_pencarian:
+                    st.success(f"Ditemukan **{len(hasil_pencarian)}** data ({metode_cari}) dalam {round(waktu_eksekusi, 2)} ms.")
+                elif 'hasil' in locals() and hasil is None: # Kasus Binary Search tidak ketemu
+                     st.info(f"Tidak ditemukan data untuk NIM tersebut ({metode_cari}) dalam {round(waktu_eksekusi, 2)} ms.")
+                elif 'hasil_pencarian' in locals() and not hasil_pencarian:
+                    st.info(f"Tidak ditemukan data yang cocok ({metode_cari}) dalam {round(waktu_eksekusi, 2)} ms.")
+            
+            except Exception as e:
+                st.error(f"❌ Terjadi kesalahan saat pencarian: {e}")
+        elif btn_cari and not q_cari:
+             st.warning("Masukkan kata kunci atau NIM untuk memulai pencarian.")
+
     with col_sort:
         st.subheader("Pengurutan Data")
         if st.session_state['role'] != 'admin':
             st.warning("Hanya Admin yang dapat melakukan pengurutan.")
         metode_sort = st.radio("Metode Pengurutan (Admin)", options=["Bubble Sort (Nama)", "Selection Sort (NIM)", "Merge Sort (Jurusan)"], horizontal=True)
+        
         if st.button("Urutkan Data", disabled=(st.session_state['role'] != 'admin')):
-            start_time = time.time()
-            if metode_sort == "Merge Sort (Jurusan)":
-                elapsed = data_manager.merge_sort_by_jurusan()
-            else:
-                data_manager.load_from_file()
-                elapsed = time.time() - start_time
-            st.success(f"✅ {metode_sort} selesai dalam {round(elapsed * 1000, 2)} ms.")
+            elapsed = 0.0 # Waktu eksekusi dalam ms
+            
+            try:
+                if metode_sort == "Merge Sort (Jurusan)":
+                    elapsed = data_manager.merge_sort_by_jurusan()
+                elif metode_sort == "Bubble Sort (Nama)":
+                    elapsed = data_manager.bubble_sort_by_nama() # Panggilan fungsi baru
+                elif metode_sort == "Selection Sort (NIM)":
+                    elapsed = data_manager.selection_sort_by_nim() # Panggilan fungsi baru
+                    
+                st.success(f"✅ **{metode_sort}** selesai dalam **{elapsed} ms**.")
+                
+            except Exception as e:
+                st.error(f"❌ Gagal melakukan pengurutan: {e}")
+            
+    # ... (Bagian Tampilan Data Hasil tetap sama) ...
     st.markdown("### Data Hasil (Utama)")
+    # Pastikan ini menampilkan data yang sudah diurutkan
     st.dataframe(data_to_df(data_manager.get_all_mahasiswa()), use_container_width=True)
 
 
 def stat_email_page():
-    st.title("📈 Statistik & 📧 Kirim Laporan (Admin)")
+    apply_transparent_background(
+        "https://s3.bukalapak.com/bukalapak-kontenz-production/content_attachments/89753/original/biaya_kuliah_unpam_2.jpg"
+    )
+    st.title("📈 Statistik & 📧 Kirim Laporan") # Judul umum
     col_stat, col_email = st.columns(2)
+    
     with col_stat:
         st.subheader("Statistik Jurusan & Cita-cita")
         df_all = data_to_df(data_manager.get_all_mahasiswa())
@@ -426,17 +650,42 @@ def stat_email_page():
             st.bar_chart(cita_counts)
         else:
             st.info("Data kosong. Tidak dapat menampilkan statistik.")
+            
     with col_email:
         st.subheader("Kirim Laporan via Email")
-        if st.session_state['role'] != 'admin':
-            st.warning("Hanya Admin yang dapat mengirim email.")
-            return
+
+        # --- LOGIK INPUT KREDENSIAL BERDASARKAN ROLE ---
+        if st.session_state['role'] == 'admin':
+            st.info("Anda menggunakan kredensial Admin yang tersimpan.")
+            user_email_pengirim = EMAIL_PENGIRIM
+            user_app_password = EMAIL_APP_PASSWORD
+        else:
+            st.warning("Sebagai user, Anda harus memasukkan Email dan App Password Anda (pastikan App Password sudah dibuat untuk aplikasi).")
+            user_email_pengirim = None
+            user_app_password = None
+        # -----------------------------------------------
+
         with st.form("form_email"):
-            email_tujuan = st.text_input("Email Tujuan (Penerima)")
+            email_tujuan = st.text_input("Email Tujuan (Penerima Laporan)")
             format_file = st.radio("Pilih Format Laporan", options=["CSV", "Excel (.xlsx)", "PDF"], horizontal=True)
+
+            # Input Kredensial Pengirim hanya untuk role 'user'
+            if st.session_state['role'] != 'admin':
+                user_email_pengirim_input = st.text_input("Email Pengirim Anda")
+                user_app_password_input = st.text_input("App Password Anda", type="password")
+            else:
+                user_email_pengirim_input = user_email_pengirim
+                user_app_password_input = user_app_password
+                
             if st.form_submit_button("Kirim Laporan"):
                 if email_tujuan:
-                    status_email = gr_kirim_email_attachment(email_tujuan, st.session_state['role'], format_file)
+                    status_email = gr_kirim_email_attachment(
+                        email_tujuan, 
+                        st.session_state['role'], 
+                        format_file, 
+                        user_email_pengirim_input, # Kredensial pengirim yang digunakan
+                        user_app_password_input    # App Password pengirim yang digunakan
+                    )
                     if "✅" in status_email:
                         st.success(status_email)
                     else:
@@ -462,7 +711,6 @@ else:
         }
         if st.session_state['role'] != 'admin':
             menu.pop("CRUD")
-            menu.pop("Stat_Email")
         selected_page = st.radio("Pilih Menu", list(menu.keys()), format_func=lambda x: menu[x])
         st.session_state['page'] = selected_page
         st.markdown("---")
@@ -481,4 +729,3 @@ else:
     else:
         st.session_state['role'] = "guest"
   
-
