@@ -622,10 +622,21 @@ def search_sort_page():
             except Exception as e:
                 st.error(f"❌ Gagal melakukan pengurutan: {e}")
             
-    # ... (Bagian Tampilan Data Hasil tetap sama) ...
-    st.markdown("### Data Hasil (Utama)")
-    # Pastikan ini menampilkan data yang sudah diurutkan
-    st.dataframe(data_to_df(data_manager.get_all_mahasiswa()), use_container_width=True)
+    # ... (setelah bagian Pengurutan Data selesai) ...
+    
+    st.markdown("### Data Hasil")
+    
+    # 💡 Cek apakah ada hasil pencarian yang ditemukan
+    if btn_cari and q_cari and hasil_pencarian:
+        st.info("Menampilkan hasil pencarian:")
+        st.dataframe(data_to_df(hasil_pencarian), use_container_width=True)
+    elif btn_cari and q_cari:
+        # Tampilkan keseluruhan jika tidak ada hasil, atau tampilkan info "tidak ditemukan"
+        st.info("Tidak ditemukan data yang cocok.")
+    else:
+        # Default: Tampilkan semua data (yang mungkin sudah diurutkan)
+        st.info("Menampilkan seluruh data mahasiswa:")
+        st.dataframe(data_to_df(data_manager.get_all_mahasiswa()), use_container_width=True)
 
 
 def stat_email_page():
