@@ -1,26 +1,219 @@
 [
-    {
-        "nama": "siapa",
-        "nim": "123456789101",
-        "jurusan": "teknik",
-        "hobi": "main",
-        "cita_cita": "main",
-        "created_at": "2025-12-13 21:37:54"
-    },
-    {
-        "nama": "Turutururu",
-        "nim": "231110412824",
-        "jurusan": "Teknik Petanian",
-        "hobi": "Basket",
-        "cita_cita": "Langit",
-        "created_at": "2025-12-13 23:00:30"
-    },
-    {
-        "nama": "iyaiyaiya",
-        "nim": "241141378923",
-        "jurusan": "angrikultur",
-        "hobi": "bermain musik",
-        "cita_cita": "singer",
-        "created_at": "2025-12-13 23:02:52"
-    }
+  {
+    "nama": "Azka Insan Robbani",
+    "nim": "24101140099",
+    "jurusan": "Teknik Informatika",
+    "hobi": "Basket",
+    "cita_cita": "Full Stack Developer"
+  },
+  {
+    "nama": "Bagus ardiansyah",
+    "nim": "241011401958",
+    "jurusan": "Desain Komunikasi Visual",
+    "hobi": "gambar",
+    "cita_cita": "Desainer Grafis Profesional"
+  },
+  {
+    "nama": "Fathur Rachman",
+    "nim": "241011401713",
+    "jurusan": "Teknik Informatika",
+    "hobi": "Badminton",
+    "cita_cita": "Data Scientist"
+  },
+  {
+    "nama": "Tumpal Sinaga",
+    "nim": "241011400087",
+    "jurusan": "Sistem Informasi",
+    "hobi": "Musik",
+    "cita_cita": "Wirausahawan Teknologi"
+  },
+  {
+    "nama": "Vina Aulia",
+    "nim": "241011401650",
+    "jurusan": "Sastra Inggris",
+    "hobi": "baca novel",
+    "cita_cita": "Penerjemah Profesional"
+  },
+  {
+    "nama": "Satria Apriza Fajar",
+    "nim": "241011400103",
+    "jurusan": "Teknik Informatika",
+    "hobi": "main pubg",
+    "cita_cita": "Game Developer"
+  },
+  {
+    "nama": "Davrielle saddad",
+    "nim": "241011400085",
+    "jurusan": "Teknik Elektro",
+    "hobi": "musik",
+    "cita_cita": "System Analyst"
+  },
+  {
+    "nama": "JANDRI HARTAT GEA",
+    "nim": "241012402295",
+    "jurusan": "Sistem Informasi",
+    "hobi": "musik",
+    "cita_cita": "IT Consultant"
+  },
+  {
+    "nama": "Walman pangaribuan",
+    "nim": "241011400094",
+    "jurusan": "Teknik Sipil",
+    "hobi": "berenang",
+    "cita_cita": "Kontraktor Sukses"
+  },
+  {
+    "nama": "Rafli",
+    "nim": "24011400075",
+    "jurusan": "Ilmu Politik",
+    "hobi": "MEMASAK dpr",
+    "cita_cita": "Anggota DPR"
+  },
+  {
+    "nama": "Jason Cornelius Chandra",
+    "nim": "241011401866",
+    "jurusan": "Manajemen",
+    "hobi": "Sepedaan",
+    "cita_cita": "Manager Keuangan"
+  },
+  {
+    "nama": "Ahmad Rasyid",
+    "nim": "241011402663",
+    "jurusan": "Teknik Mesin",
+    "hobi": "bola",
+    "cita_cita": "Engineer Otomotif"
+  },
+  {
+    "nama": "Ferda Ayi Sukaesih Sutanto",
+    "nim": "241011400068",
+    "jurusan": "Teknik Pangan",
+    "hobi": "masak",
+    "cita_cita": "Ahli Gizi dan Kuliner"
+  },
+  {
+    "nama": "M. Ikram Maulana",
+    "nim": "241011402896",
+    "jurusan": "Teknik Informatika",
+    "hobi": "Eksplor",
+    "cita_cita": "Full Stack Developer"
+  },
+  {
+    "nama": "Nazril Supriyadi",
+    "nim": "241011400091",
+    "jurusan": "Pendidikan Jasmani",
+    "hobi": "sepak bola",
+    "cita_cita": "Pelatih Sepak Bola"
+  },
+  {
+    "nama": "Ade jahwa aulia",
+    "nim": "241011402829",
+    "jurusan": "Seni Pertunjukan",
+    "hobi": "dancing",
+    "cita_cita": "Koreografer Ternama"
+  },
+  {
+    "nama": "Maulana ikhsan fadhillah",
+    "nim": "241011400092",
+    "jurusan": "Ilmu Kelautan",
+    "hobi": "mancing",
+    "cita_cita": "Peneliti Kelautan"
+  },
+  {
+    "nama": "Dea Amellya",
+    "nim": "241011400089",
+    "jurusan": "Komunikasi",
+    "hobi": "mendengarkan musik",
+    "cita_cita": "Public Relations"
+  },
+  {
+    "nama": "Risqi Eko Trianto",
+    "nim": "241011402427",
+    "jurusan": "Teknik Informatika",
+    "hobi": "Badminton",
+    "cita_cita": "Data Scientist"
+  },
+  {
+    "nama": "Rizki Ramadani",
+    "nim": "241011400098",
+    "jurusan": "Hukum",
+    "hobi": "Discussion",
+    "cita_cita": "Pengacara/Jaksa"
+  },
+  {
+    "nama": "muhammad alif fajriansyah",
+    "nim": "241011402197",
+    "jurusan": "Teknik Sipil",
+    "hobi": "ngeliatin orang berangkat kerja",
+    "cita_cita": "Kontraktor Sukses"
+  },
+  {
+    "nama": "dzaki ramadhan",
+    "nim": "241011400097",
+    "jurusan": "Teknik Elektro",
+    "hobi": "badminton",
+    "cita_cita": "Engineer Robotika"
+  },
+  {
+    "nama": "Servatius Hasta Kristanto",
+    "nim": "241011400076",
+    "jurusan": "Teknik Pangan",
+    "hobi": "Masak",
+    "cita_cita": "Ahli Gizi dan Kuliner"
+  },
+  {
+    "nama": "Ahmad Firdaus",
+    "nim": "241011401761",
+    "jurusan": "Sistem Informasi",
+    "hobi": "mancing di roblox",
+    "cita_cita": "IT Consultant"
+  },
+  {
+    "nama": "Ade sofyan",
+    "nim": "241011402338",
+    "jurusan": "Ekonomi",
+    "hobi": "mulung",
+    "cita_cita": "Pialang Saham"
+  },
+  {
+    "nama": "Dimas Ahmad",
+    "nim": "241011402835",
+    "jurusan": "Desain Komunikasi Visual",
+    "hobi": "gacha",
+    "cita_cita": "Ilustrator Game"
+  },
+  {
+    "nama": "Adam Darmansyah",
+    "nim": "241011401470",
+    "jurusan": "Kedokteran Hewan",
+    "hobi": "Main Ayam",
+    "cita_cita": "Dokter Hewan Spesialis"
+  },
+  {
+    "nama": "Muhammad Noer Alam P",
+    "nim": "241011400079",
+    "jurusan": "Teknik Lingkungan",
+    "hobi": "mandi lumpur",
+    "cita_cita": "Konsultan Lingkungan"
+  },
+  {
+    "nama": "Azmi Al Fahriza",
+    "nim": "241011403269",
+    "jurusan": "Agribisnis",
+    "hobi": "ternak lele",
+    "cita_cita": "Pengusaha Agribisnis"
+  },
+  {
+    "nama": "Ahmad Irfan",
+    "nim": "241011402053",
+    "jurusan": "Geologi",
+    "hobi": "makan batu",
+    "cita_cita": "Ahli Geologi Eksplorasi"
+  },
+  {
+    "nama": "Gregorius Gilbert Ieli Sarjana",
+    "nim": "241011402382",
+    "jurusan": "Seni Musik",
+    "hobi": "Musik",
+    "cita_cita": "Komposer Musik Film"
+  }
 ]
